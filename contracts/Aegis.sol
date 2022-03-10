@@ -39,7 +39,7 @@ contract Aegis {
     modifier callerIsUser() {
         require(
             users[msg.sender].publicKey != address(0),
-            "User does not exist."
+            "Caller is not an user."
         );
         _;
     }
@@ -85,5 +85,21 @@ contract Aegis {
             publicKey: payable(msg.sender),
             nftAddress: nftAddress
         });
+    }
+
+    function followUser(address publicKey)
+        public
+        callerIsUser
+        isUser(publicKey)
+    {
+        User memory user = users[publicKey];
+        AegisFollowers token = AegisFollowers(user.nftAddress);
+
+        //mint an AegisFollowers NFT for the user if he doesn't own any
+        if (token.balanceOf(msg.sender) == 0) {
+            token.safeMint(msg.sender);
+        }
+
+        emit UserFollowed({follower: msg.sender, followed: publicKey});
     }
 }

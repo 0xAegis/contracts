@@ -2,20 +2,20 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 describe("Aegis", function () {
-  describe("User Account", function () {
-    let aegis, aegisFollowersFactory;
-    let addr1, addr2;
+  let aegis, aegisFollowersFactory;
+  let addr1, addr2, addr3;
 
-    beforeEach(async () => {
-      [addr1, addr2] = await ethers.getSigners();
-      aegisFollowersFactory = await ethers.getContractFactory(
-        "contracts/AegisFollowers.sol:AegisFollowers"
-      );
-      const aegisFactory = await ethers.getContractFactory("Aegis");
-      aegis = await aegisFactory.deploy();
-      await aegis.deployed();
-    });
+  beforeEach(async () => {
+    [addr1, addr2, addr3] = await ethers.getSigners();
+    aegisFollowersFactory = await ethers.getContractFactory(
+      "contracts/AegisFollowers.sol:AegisFollowers"
+    );
+    const aegisFactory = await ethers.getContractFactory("Aegis");
+    aegis = await aegisFactory.deploy();
+    await aegis.deployed();
+  });
 
+  describe("Create User", function () {
     it("can create a new user", async function () {
       // deploy an AegisFollowers NFT collection
       const aegisFollowers = await aegisFollowersFactory.deploy();
@@ -127,6 +127,137 @@ describe("Aegis", function () {
       expect.fail(
         "Did not fail to create a new user when there are existing minted NFTs for the given collection"
       );
+    });
+  });
+
+  describe("Follow User", function () {
+    let aegisFollowers1, aegisFollowers2;
+
+    beforeEach(async () => {
+      // deploy an AegisFollowers NFT collection
+      aegisFollowers1 = await aegisFollowersFactory.deploy();
+      await aegisFollowers1.deployed();
+      //transfer ownership to Aegis
+      const transferOwnershipTx1 = await aegisFollowers1.transferOwnership(
+        aegis.address
+      );
+      await transferOwnershipTx1.wait();
+
+      // deploy an AegisFollowers NFT collection
+      aegisFollowers2 = await aegisFollowersFactory.deploy();
+      await aegisFollowers2.deployed();
+      //transfer ownership to Aegis
+      const transferOwnershipTx2 = await aegisFollowers2.transferOwnership(
+        aegis.address
+      );
+      await transferOwnershipTx2.wait();
+    });
+
+    it("can follow user", async function () {
+      //create influencer user
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        aegisFollowers1.address
+      );
+      await newUserTx1.wait();
+
+      //create follower user
+      const newUserTx2 = await aegis
+        .connect(addr2)
+        .createUser("sample follower", aegisFollowers2.address);
+      await newUserTx2.wait();
+
+      //follow user
+      const followTx = await aegis.connect(addr2).followUser(addr1.address);
+      await followTx.wait();
+
+      //follower should hold an nft of the influencer now
+      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
+    });
+
+    it("can follow user when follower already holds an NFT of the influencer", async function () {
+      //create influencer user
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        aegisFollowers1.address
+      );
+      await newUserTx1.wait();
+
+      //create follower 1 user
+      const newUserTx2 = await aegis
+        .connect(addr2)
+        .createUser("sample follower 1", aegisFollowers2.address);
+      await newUserTx2.wait();
+
+      // deploy an AegisFollowers NFT collection
+      aegisFollowers3 = await aegisFollowersFactory.deploy();
+      await aegisFollowers3.deployed();
+      //transfer ownership to Aegis
+      const transferOwnershipTx3 = await aegisFollowers3.transferOwnership(
+        aegis.address
+      );
+      await transferOwnershipTx3.wait();
+      //create follower 2 user
+      const newUserTx3 = await aegis
+        .connect(addr3)
+        .createUser("sample follower 2", aegisFollowers3.address);
+      await newUserTx3.wait();
+
+      //follower 1 follows influencer
+      const followTx1 = await aegis.connect(addr2).followUser(addr1.address);
+      await followTx1.wait();
+
+      //follower 1 should hold an nft of the influencer now
+      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
+
+      //follower 1 transfers NFT to follower 2
+      const transferTx = await aegisFollowers1
+        .connect(addr2)
+        .transferFrom(addr2.address, addr3.address, 0);
+      await transferTx.wait();
+
+      //follower 2 should hold the nft influencer now
+      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(0);
+      expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
+
+      //follower 2 follows influencer
+      const followTx2 = await aegis.connect(addr3).followUser(addr1.address);
+      await followTx2.wait();
+
+      //follower 2 still should 1
+      expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
+    });
+
+    it("fails to follow user when caller isn't an user", async function () {
+      //create influencer user
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        aegisFollowers1.address
+      );
+      await newUserTx1.wait();
+
+      //follow user
+      try {
+        const followTx = await aegis.connect(addr2).followUser(addr1.address);
+      } catch (error) {
+        expect(error.message).to.include("Caller is not an user.");
+      }
+    });
+
+    it("fails to follow user when the user to be followed doesn't exist", async function () {
+      //create user
+      const newUserTx1 = await aegis.createUser(
+        "sample user",
+        aegisFollowers1.address
+      );
+      await newUserTx1.wait();
+
+      //follow user
+      try {
+        const followTx = await aegis.followUser(addr2.address);
+      } catch (error) {
+        expect(error.message).to.include("User does not exist.");
+      }
     });
   });
 });
