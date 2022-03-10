@@ -86,16 +86,4 @@ contract Aegis {
             nftAddress: nftAddress
         });
     }
-
-    function followUser(address publicKey)
-        public
-        callerIsUser
-        isUser(publicKey)
-    {
-        User memory user = users[publicKey];
-        AegisFollowers token = AegisFollowers(user.nftAddress);
-        token.safeMint(publicKey);
-
-        emit UserFollowed({follower: msg.sender, followed: publicKey});
-    }
 }
