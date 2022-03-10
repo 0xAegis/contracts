@@ -4,10 +4,10 @@ const { ethers } = require("hardhat");
 describe("Aegis", function () {
   describe("User Acount", function () {
     let aegis;
-    let accounts;
+    let addr1, addr2;
 
     beforeEach(async () => {
-      accounts = await ethers.getSigners();
+      [addr1, addr2] = await ethers.getSigners();
       const Aegis = await ethers.getContractFactory("Aegis");
       aegis = await Aegis.deploy();
       await aegis.deployed();
@@ -18,11 +18,11 @@ describe("Aegis", function () {
         const newUserTx = await aegis.createAccount("sample username");
         await newUserTx.wait();
       } catch (error) {
-        console.log("Error: ", error);
+        console.log(error.message);
       }
-      const user = await aegis.users(accounts[0].address);
+      const user = await aegis.users(addr1.address);
       expect(user.username).to.equal("sample username");
-      expect(user.publicKey).to.equal(accounts[0].address);
+      expect(user.publicKey).to.equal(addr1.address);
     });
   });
 });
