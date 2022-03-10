@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
-import "hardhat/console.sol";
 
 interface AegisFollowers is IERC721Enumerable {
     function owner() external view returns (address);
@@ -65,10 +64,13 @@ contract Aegis {
         //the owner of the collection should be this contract, so that only it can mint new NFTs
         require(
             token.owner() == address(this),
-            "Token contract is not owned by Aegis"
+            "NFT collection is not owned by Aegis."
         );
         //the NFT collection should be new, with zero existing minted NFTs
-        require(token.totalSupply() == 0, "Token's total supply is not zero.");
+        require(
+            token.totalSupply() == 0,
+            "NFT collection's total supply is not zero."
+        );
 
         User memory newUser = User({
             username: username,
