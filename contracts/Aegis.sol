@@ -29,7 +29,7 @@ contract Aegis {
         _;
     }
 
-    function createAccount(string memory username) public isNotAnExistingUser {
+    function createUser(string memory username) public isNotAnExistingUser {
         User memory newUser = User({
             username: username,
             publicKey: payable(msg.sender)
