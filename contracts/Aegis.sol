@@ -11,7 +11,7 @@ contract Aegis {
         address payable publicKey;
     }
 
-    event userCreated(string username, address payable publicKey);
+    event UserCreated(string username, address payable publicKey);
 
     // User [] public users;
     mapping(address => User) public users;
@@ -37,6 +37,6 @@ contract Aegis {
         users[msg.sender] = newUser;
 
         //emit new event
-        emit userCreated({username: username, publicKey: payable(msg.sender)});
+        emit UserCreated({username: username, publicKey: payable(msg.sender)});
     }
 }
