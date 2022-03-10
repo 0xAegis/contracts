@@ -18,13 +18,13 @@ contract Aegis {
     struct User {
         string username;
         address payable publicKey;
-        address tokenAddress;
+        address nftAddress;
     }
 
     event UserCreated(
         string username,
         address payable publicKey,
-        address tokenAddress
+        address nftAddress
     );
     event UserFollowed(address follower, address followed);
 
@@ -53,8 +53,8 @@ contract Aegis {
         _;
     }
 
-    function createUser(string memory username, address tokenAddress) public {
-        AegisFollowers token = AegisFollowers(tokenAddress);
+    function createUser(string memory username, address nftAddress) public {
+        AegisFollowers token = AegisFollowers(nftAddress);
 
         //user should not already exist
         require(
@@ -75,7 +75,7 @@ contract Aegis {
         User memory newUser = User({
             username: username,
             publicKey: payable(msg.sender),
-            tokenAddress: tokenAddress
+            nftAddress: nftAddress
         });
         users[msg.sender] = newUser;
 
@@ -83,7 +83,7 @@ contract Aegis {
         emit UserCreated({
             username: username,
             publicKey: payable(msg.sender),
-            tokenAddress: tokenAddress
+            nftAddress: nftAddress
         });
     }
 
@@ -93,7 +93,7 @@ contract Aegis {
         isUser(publicKey)
     {
         User memory user = users[publicKey];
-        AegisFollowers token = AegisFollowers(user.tokenAddress);
+        AegisFollowers token = AegisFollowers(user.nftAddress);
         token.safeMint(publicKey);
 
         emit UserFollowed({follower: msg.sender, followed: publicKey});

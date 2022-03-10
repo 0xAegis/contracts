@@ -35,7 +35,7 @@ describe("Aegis", function () {
       const user = await aegis.users(addr1.address);
       expect(user.username).to.equal("sample username");
       expect(user.publicKey).to.equal(addr1.address);
-      expect(user.tokenAddress).to.equal(aegisFollowers.address);
+      expect(user.nftAddress).to.equal(aegisFollowers.address);
     });
 
     it("fails to create a new user when user already exists", async function () {
