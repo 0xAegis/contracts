@@ -86,8 +86,8 @@ contract Aegis {
         callerIsUser
         isUser(publicKey)
     {
-        User memory user = users[publicKey];
-        AegisFollowers token = AegisFollowers(user.nftAddress);
+        User memory userToFollow = users[publicKey];
+        AegisFollowers token = AegisFollowers(userToFollow.nftAddress);
 
         //mint an AegisFollowers NFT for the user if he doesn't own any
         if (token.balanceOf(msg.sender) == 0) {
@@ -95,5 +95,17 @@ contract Aegis {
         }
 
         emit UserFollowed({follower: msg.sender, followed: publicKey});
+    }
+
+    function isFollower(address follower, address followed)
+        public
+        view
+        isUser(follower)
+        isUser(followed)
+        returns (bool)
+    {
+        User memory followedUser = users[followed];
+        AegisFollowers token = AegisFollowers(followedUser.nftAddress);
+        return token.balanceOf(follower) > 0;
     }
 }
