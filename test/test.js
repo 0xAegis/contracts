@@ -235,7 +235,7 @@ describe("Aegis", function () {
       expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(0);
       expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
 
-      //follower 1 is a follower anymore, follower 2 is
+      //follower 1 is not a follower anymore, follower 2 is
       expect(await aegis.isFollower(addr2.address, addr1.address)).is.false;
       expect(await aegis.isFollower(addr3.address, addr1.address)).is.true;
 
@@ -310,7 +310,10 @@ describe("Aegis", function () {
         const followTx = await aegis.connect(addr2).followUser(addr1.address);
       } catch (error) {
         expect(error.message).to.include("Caller is not an user.");
+        return;
       }
+
+      expect.fail("Did not fail to follow user when caller isn't an user");
     });
 
     it("fails to follow user when the user to be followed doesn't exist", async function () {
@@ -326,7 +329,12 @@ describe("Aegis", function () {
         const followTx = await aegis.followUser(addr2.address);
       } catch (error) {
         expect(error.message).to.include("User does not exist.");
+        return;
       }
+
+      expect.fail(
+        "Did not fail to follow user when the user to be followed doesn't exist"
+      );
     });
   });
 });
