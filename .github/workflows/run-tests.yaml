@@ -3,6 +3,7 @@ name: run-tests
 on:
   pull_request:
     branches: [main]
+    # the pull_request activities which will trigger this workflow
     types: [opened, reopened, updated, synchronize]
 jobs:
   test:
