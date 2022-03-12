@@ -1,0 +1,20 @@
+name: run-tests
+# runs when there's a new PR or when the PR is updated
+on:
+  pull_request:
+    branches: [main]
+    # the pull_request activities which will trigger this workflow
+    types: [opened, reopened, updated, synchronize]
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Set up node 
+        uses: actions/setup-node@v3
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests 
+        run: npx hardhat test
