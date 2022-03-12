@@ -86,8 +86,8 @@ contract Aegis {
         callerIsUser
         isUser(publicKey)
     {
-        User memory userToFollow = users[publicKey];
-        AegisFollowers token = AegisFollowers(userToFollow.nftAddress);
+        User memory user = users[publicKey];
+        AegisFollowers token = AegisFollowers(user.nftAddress);
 
         //mint an AegisFollowers NFT for the user if he doesn't own any
         if (token.balanceOf(msg.sender) == 0) {
