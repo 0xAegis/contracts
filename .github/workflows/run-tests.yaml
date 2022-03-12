@@ -2,7 +2,7 @@ name: run-tests
 # runs when there's a new PR or when the PR is updated
 on:
   pull_request:
-    branches: [main]
+    branches: [master]
     # the pull_request activities which will trigger this workflow
     types: [opened, reopened, updated, synchronize]
 jobs:
