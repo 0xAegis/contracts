@@ -337,4 +337,92 @@ describe("Aegis", function () {
       );
     });
   });
+
+  describe("Create Post", () => {
+    let user;
+
+    beforeEach(async () => {
+      // deploy an AegisFollowers NFT collection
+      aegisFollowers = await aegisFollowersFactory.deploy();
+      await aegisFollowers.deployed();
+      //transfer ownership to Aegis
+      const transferOwnershipTx = await aegisFollowers.transferOwnership(
+        aegis.address
+      );
+      await transferOwnershipTx.wait();
+
+      //create new user
+      const newUserTx = await aegis.createUser(
+        "sample user",
+        aegisFollowers.address
+      );
+      await newUserTx.wait();
+    });
+
+    it("can create a new post", async () => {
+      // Create post
+      const createPostTx = await aegis.createPost(
+        "Hello world!",
+        [
+          "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e5",
+          "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e6",
+        ],
+        true
+      );
+      await createPostTx.wait();
+
+      //post count of the user should be 1
+      expect(await aegis.getPostCount(addr1.address)).to.equal(1);
+
+      //assert post has the expected content
+      const newPost = await aegis.getPost(addr1.address, 0);
+      expect(newPost.text).to.equal("Hello world!");
+      expect(newPost.isPaid).to.equal(true);
+      expect(newPost.attachments).to.have.same.members([
+        "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e5",
+        "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e6",
+      ]);
+    });
+
+    it("fails to create a post when post text is too long", async () => {
+      const maxPostLength = (await aegis.maxPostLength()).toNumber();
+      try {
+        // Create post with string length greater than maxPostLength
+        const createPostTx = await aegis.createPost(
+          "x".repeat(maxPostLength + 1),
+          [
+            "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e5",
+            "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e6",
+          ],
+          true
+        );
+      } catch (error) {
+        expect(error.message).to.include("Post text is too long.");
+        return;
+      }
+
+      expect.fail("Did not fail to create post when post text is too long.");
+    });
+
+    it("fails to create a post when post has too many attachments", async () => {
+      const maxNumAttachments = (await aegis.maxNumAttachments()).toNumber();
+      try {
+        // Create post with no. of attachments greater than maxNumAttachments
+        const createPostTx = await aegis.createPost(
+          "Hello world!",
+          Array(maxNumAttachments + 1).fill(
+            "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e5"
+          ),
+          true
+        );
+      } catch (error) {
+        expect(error.message).to.include("Too many attachments.");
+        return;
+      }
+
+      expect.fail(
+        "Did not fail to create post when post has too many attachments"
+      );
+    });
+  });
 });
