@@ -2,13 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol";
-
-interface AegisFollowers is IERC721Enumerable {
-    function owner() external view returns (address);
-
-    function safeMint(address to) external;
-}
+import "./AegisFollowers.sol";
 
 contract Aegis {
     using Counters for Counters.Counter;
@@ -101,5 +95,17 @@ contract Aegis {
         }
 
         emit UserFollowed({follower: msg.sender, followed: publicKey});
+    }
+
+    function isFollower(address follower, address followed)
+        public
+        view
+        isUser(follower)
+        isUser(followed)
+        returns (bool)
+    {
+        User memory followedUser = users[followed];
+        AegisFollowers token = AegisFollowers(followedUser.nftAddress);
+        return token.balanceOf(follower) > 0;
     }
 }
