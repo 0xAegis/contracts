@@ -5,10 +5,11 @@ on:
     branches: [master]
     # the pull_request activities which will trigger this workflow
     types: [opened, reopened, updated, synchronize]
+# dummy env vars so that Github CI doesn't fail complaning that Hardhat config is invalid
 env:
   MUMBAI_RPC_URL: dummy-url
   POLYGON_RPC_URL: dummy-url
-  PRIVATE_KEY: dummy-key
+  PRIVATE_KEY: 4899e9f27351677bb5bb5ae127e87cbff93100633b2ad1390f159ab5738a532d
 jobs:
   test:
     name: Run tests
