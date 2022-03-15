@@ -25,6 +25,9 @@ contract Aegis {
     // User [] public users;
     mapping(address => User) public users;
 
+    //if the user has minted his own follower NFT or not, (followedAddress => (followerAddress => bool))
+    mapping(address => mapping(address => bool)) public userHasFollowerNft;
+
     constructor() {
         manager = msg.sender;
     }
@@ -87,11 +90,12 @@ contract Aegis {
         isUser(publicKey)
     {
         User memory user = users[publicKey];
-        AegisFollowers token = AegisFollowers(user.nftAddress);
 
-        //mint an AegisFollowers NFT for the user if he doesn't own any
-        if (token.balanceOf(msg.sender) == 0) {
+        //mint an AegisFollowers NFT for the user if he doesn't have his own yet
+        if (!userHasFollowerNft[publicKey][msg.sender]) {
+            AegisFollowers token = AegisFollowers(user.nftAddress);
             token.safeMint(msg.sender);
+            userHasFollowerNft[publicKey][msg.sender] = true;
         }
 
         emit UserFollowed({follower: msg.sender, followed: publicKey});
