@@ -8,11 +8,19 @@ contract Aegis {
     using Counters for Counters.Counter;
 
     address public manager;
+    uint256 public constant maxPostLength = 1024;
+    uint256 public constant maxNumAttachments = 10;
 
     struct User {
         string username;
         address payable publicKey;
         address nftAddress;
+    }
+
+    struct Post {
+        string text;
+        string[] attachments;
+        bool isPaid;
     }
 
     event UserCreated(
@@ -21,9 +29,16 @@ contract Aegis {
         address nftAddress
     );
     event UserFollowed(address follower, address followed);
+    event PostCreated(
+        address user,
+        string text,
+        string[] attachments,
+        bool isPaid
+    );
 
     // User [] public users;
     mapping(address => User) public users;
+    mapping(address => Post[]) public posts;
 
     constructor() {
         manager = msg.sender;
@@ -95,5 +110,48 @@ contract Aegis {
         }
 
         emit UserFollowed({follower: msg.sender, followed: publicKey});
+    }
+
+    function createPost(
+        string calldata text,
+        string[] calldata attachments,
+        bool isPaid
+    ) public callerIsUser {
+        //make sure post is not too big or doesn't have too many attachments
+        require(bytes(text).length <= maxPostLength, "Post text is too long.");
+        require(
+            attachments.length <= maxNumAttachments,
+            "Too many attachments."
+        );
+
+        //create post and push it to the posts array of the user
+        Post memory newPost = Post({
+            text: text,
+            attachments: attachments,
+            isPaid: isPaid
+        });
+        posts[msg.sender].push(newPost);
+
+        //emit PostCreated event
+        emit PostCreated({
+            user: msg.sender,
+            text: text,
+            attachments: attachments,
+            isPaid: isPaid
+        });
+    }
+
+    //get the number of posts of an user
+    function getPostCount(address user) public view returns (uint256) {
+        return posts[user].length;
+    }
+
+    //get post of an user by index
+    function getPost(address user, uint256 postIndex)
+        public
+        view
+        returns (Post memory)
+    {
+        return posts[user][postIndex];
     }
 }
