@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Aegis", function () {
+describe("Aegis", () => {
   let aegis, aegisFollowersFactory;
   let addr1, addr2, addr3;
 
@@ -15,8 +15,8 @@ describe("Aegis", function () {
     await aegis.deployed();
   });
 
-  describe("Create User", function () {
-    it("can create a new user", async function () {
+  describe("Create User", () => {
+    it("can create a new user", async () => {
       // deploy an AegisFollowers NFT collection
       const aegisFollowers = await aegisFollowersFactory.deploy();
       await aegisFollowers.deployed();
@@ -38,7 +38,7 @@ describe("Aegis", function () {
       expect(user.nftAddress).to.equal(aegisFollowers.address);
     });
 
-    it("fails to create a new user when user already exists", async function () {
+    it("fails to create a new user when user already exists", async () => {
       // deploy an AegisFollowers NFT collection and transfer ownership to Aegis
       const aegisFollowers = await aegisFollowersFactory.deploy();
       await aegisFollowers.deployed();
@@ -71,7 +71,7 @@ describe("Aegis", function () {
       );
     });
 
-    it("fails to create a new user when NFT collection is not owned by the Aegis contract", async function () {
+    it("fails to create a new user when NFT collection is not owned by the Aegis contract", async () => {
       // deploy an AegisFollowers NFT collection
       const aegisFollowers = await aegisFollowersFactory.deploy();
       await aegisFollowers.deployed();
@@ -96,7 +96,7 @@ describe("Aegis", function () {
       );
     });
 
-    it("fails to create a new user when there are existing minted NFTs for the given collection", async function () {
+    it("fails to create a new user when there are existing minted NFTs for the given collection", async () => {
       // deploy an AegisFollowers NFT collection
       const aegisFollowers = await aegisFollowersFactory.deploy();
       await aegisFollowers.deployed();
@@ -130,7 +130,7 @@ describe("Aegis", function () {
     });
   });
 
-  describe("Follow User", function () {
+  describe("Follow User", () => {
     let aegisFollowers1, aegisFollowers2;
 
     beforeEach(async () => {
@@ -153,7 +153,7 @@ describe("Aegis", function () {
       await transferOwnershipTx2.wait();
     });
 
-    it("can follow user", async function () {
+    it("can follow user", async () => {
       //create influencer user
       const newUserTx1 = await aegis.createUser(
         "sample influencer",
@@ -167,21 +167,15 @@ describe("Aegis", function () {
         .createUser("sample follower", aegisFollowers2.address);
       await newUserTx2.wait();
 
-      //isFollower should return false
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.false;
-
       //follow user
       const followTx = await aegis.connect(addr2).followUser(addr1.address);
       await followTx.wait();
 
       //follower should hold an nft of the influencer now
       expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
-
-      //isFollower should return true
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.true;
     });
 
-    it("can follow user when follower already holds an NFT of the influencer", async function () {
+    it("can follow user when follower already holds an NFT of the influencer", async () => {
       //create influencer user
       const newUserTx1 = await aegis.createUser(
         "sample influencer",
@@ -209,21 +203,12 @@ describe("Aegis", function () {
         .createUser("sample follower 2", aegisFollowers3.address);
       await newUserTx3.wait();
 
-      //follower 1 is not yet a follower of the influencer
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.false;
-
       //follower 1 follows influencer
       const followTx1 = await aegis.connect(addr2).followUser(addr1.address);
       await followTx1.wait();
 
       //follower 1 should hold an nft of the influencer now
       expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
-
-      //follower 1 is a follower of the influencer now
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.true;
-
-      //follower 2 is not a follower
-      expect(await aegis.isFollower(addr3.address, addr1.address)).is.false;
 
       //follower 1 transfers NFT to follower 2
       const transferTx = await aegisFollowers1
@@ -235,21 +220,15 @@ describe("Aegis", function () {
       expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(0);
       expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
 
-      //follower 1 is not a follower anymore, follower 2 is
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.false;
-      expect(await aegis.isFollower(addr3.address, addr1.address)).is.true;
-
       //follower 2 follows influencer
       const followTx2 = await aegis.connect(addr3).followUser(addr1.address);
       await followTx2.wait();
 
       //follower 2 still should hold 1 NFT
       expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
-      //follower 2 is still a follower
-      expect(await aegis.isFollower(addr3.address, addr1.address)).is.true;
     });
 
-    it("returns isFollower as true when follower holds multiple NFTs of the influencer", async function () {
+    it("returns isFollower as true when follower holds multiple NFTs of the influencer", async () => {
       //create influencer user
       const newUserTx1 = await aegis.createUser(
         "sample influencer",
@@ -293,11 +272,9 @@ describe("Aegis", function () {
 
       //follower 2 should hold 2 NFTs of the influencer now
       expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(2);
-      //follower 2 is still a follower
-      expect(await aegis.isFollower(addr3.address, addr1.address)).is.true;
     });
 
-    it("fails to follow user when caller isn't an user", async function () {
+    it("fails to follow user when caller isn't an user", async () => {
       //create influencer user
       const newUserTx1 = await aegis.createUser(
         "sample influencer",
@@ -316,7 +293,7 @@ describe("Aegis", function () {
       expect.fail("Did not fail to follow user when caller isn't an user");
     });
 
-    it("fails to follow user when the user to be followed doesn't exist", async function () {
+    it("fails to follow user when the user to be followed doesn't exist", async () => {
       //create user
       const newUserTx1 = await aegis.createUser(
         "sample user",
