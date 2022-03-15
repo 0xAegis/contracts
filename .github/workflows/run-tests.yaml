@@ -5,6 +5,10 @@ on:
     branches: [master]
     # the pull_request activities which will trigger this workflow
     types: [opened, reopened, updated, synchronize]
+env:
+  MUMBAI_RPC_URL: dummy-url
+  POLYGON_RPC_URL: dummy-url
+  PRIVATE_KEY: dummy-key
 jobs:
   test:
     name: Run tests
