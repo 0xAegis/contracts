@@ -167,18 +167,12 @@ describe("Aegis", () => {
         .createUser("sample follower", aegisFollowers2.address);
       await newUserTx2.wait();
 
-      //isFollower should return false
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.false;
-
       //follow user
       const followTx = await aegis.connect(addr2).followUser(addr1.address);
       await followTx.wait();
 
       //follower should hold an nft of the influencer now
       expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
-
-      //isFollower should return true
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.true;
     });
 
     it("can follow user when follower already holds an NFT of the influencer", async () => {
@@ -209,21 +203,12 @@ describe("Aegis", () => {
         .createUser("sample follower 2", aegisFollowers3.address);
       await newUserTx3.wait();
 
-      //follower 1 is not yet a follower of the influencer
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.false;
-
       //follower 1 follows influencer
       const followTx1 = await aegis.connect(addr2).followUser(addr1.address);
       await followTx1.wait();
 
       //follower 1 should hold an nft of the influencer now
       expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
-
-      //follower 1 is a follower of the influencer now
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.true;
-
-      //follower 2 is not a follower
-      expect(await aegis.isFollower(addr3.address, addr1.address)).is.false;
 
       //follower 1 transfers NFT to follower 2
       const transferTx = await aegisFollowers1
@@ -235,18 +220,12 @@ describe("Aegis", () => {
       expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(0);
       expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
 
-      //follower 1 is not a follower anymore, follower 2 is
-      expect(await aegis.isFollower(addr2.address, addr1.address)).is.false;
-      expect(await aegis.isFollower(addr3.address, addr1.address)).is.true;
-
       //follower 2 follows influencer
       const followTx2 = await aegis.connect(addr3).followUser(addr1.address);
       await followTx2.wait();
 
       //follower 2 still should hold 1 NFT
       expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
-      //follower 2 is still a follower
-      expect(await aegis.isFollower(addr3.address, addr1.address)).is.true;
     });
 
     it("returns isFollower as true when follower holds multiple NFTs of the influencer", async () => {
@@ -293,8 +272,6 @@ describe("Aegis", () => {
 
       //follower 2 should hold 2 NFTs of the influencer now
       expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(2);
-      //follower 2 is still a follower
-      expect(await aegis.isFollower(addr3.address, addr1.address)).is.true;
     });
 
     it("fails to follow user when caller isn't an user", async () => {

@@ -96,16 +96,4 @@ contract Aegis {
 
         emit UserFollowed({follower: msg.sender, followed: publicKey});
     }
-
-    function isFollower(address follower, address followed)
-        public
-        view
-        isUser(follower)
-        isUser(followed)
-        returns (bool)
-    {
-        User memory followedUser = users[followed];
-        AegisFollowers token = AegisFollowers(followedUser.nftAddress);
-        return token.balanceOf(follower) > 0;
-    }
 }
