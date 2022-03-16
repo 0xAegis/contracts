@@ -224,8 +224,46 @@ describe("Aegis", () => {
       const followTx2 = await aegis.connect(addr3).followUser(addr1.address);
       await followTx2.wait();
 
-      //follower 2 still should hold 1 NFT
-      expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
+      //follower 2 still should now hold 2 NFTs, because he needs his own unique one too
+      expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(2);
+    });
+
+    it("following multiple times does not result in multiple follower NFTs", async () => {
+      //create influencer user
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        aegisFollowers1.address
+      );
+      await newUserTx1.wait();
+
+      //create follower 1 user
+      const newUserTx2 = await aegis
+        .connect(addr2)
+        .createUser("sample follower 1", aegisFollowers2.address);
+      await newUserTx2.wait();
+
+      // deploy an AegisFollowers NFT collection
+      aegisFollowers3 = await aegisFollowersFactory.deploy();
+      await aegisFollowers3.deployed();
+      //transfer ownership to Aegis
+      const transferOwnershipTx3 = await aegisFollowers3.transferOwnership(
+        aegis.address
+      );
+      await transferOwnershipTx3.wait();
+
+      //follower 1 follows influencer
+      const followTx1 = await aegis.connect(addr2).followUser(addr1.address);
+      await followTx1.wait();
+
+      //follower 1 should hold an nft of the influencer now
+      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
+
+      //follower 1 follows influencer again
+      const followTx2 = await aegis.connect(addr2).followUser(addr1.address);
+      await followTx2.wait();
+
+      //follower 2 should still hold a single nft of the influencer
+      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
     });
 
     it("returns isFollower as true when follower holds multiple NFTs of the influencer", async () => {
