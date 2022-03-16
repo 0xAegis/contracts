@@ -65,29 +65,19 @@ contract Aegis {
         _;
     }
 
-    function createUser(string memory username, address nftAddress) public {
-        AegisFollowers token = AegisFollowers(nftAddress);
-
+    function createUser(string memory username) public {
         //user should not already exist
         require(
             users[msg.sender].publicKey == address(0),
             "User already exists."
         );
-        //the owner of the collection should be this contract, so that only it can mint new NFTs
-        require(
-            token.owner() == address(this),
-            "NFT collection is not owned by Aegis."
-        );
-        //the NFT collection should be new, with zero existing minted NFTs
-        require(
-            token.totalSupply() == 0,
-            "NFT collection's total supply is not zero."
-        );
+        //deploy new NFT collection for this user
+        AegisFollowers nftContract = new AegisFollowers();
 
         User memory newUser = User({
             username: username,
             publicKey: payable(msg.sender),
-            nftAddress: nftAddress
+            nftAddress: address(nftContract)
         });
         users[msg.sender] = newUser;
 
@@ -95,7 +85,7 @@ contract Aegis {
         emit UserCreated({
             username: username,
             publicKey: payable(msg.sender),
-            nftAddress: nftAddress
+            nftAddress: address(nftContract)
         });
     }
 
