@@ -204,10 +204,14 @@ describe("Aegis", () => {
       const user = await aegis.users(addr1.address);
       expect(user.numPosts[0].toNumber()).to.equal(1);
 
-      //assert post has the expected content
+      //create a filter for filtering events: addr1.address should be the user, 0 should be the postIndex
       const filter = aegis.filters.PostCreated(addr1.address, 0);
+      //get all the events that match the above filter
       const postCreatedEvents = await aegis.queryFilter(filter);
+      //we know there will be only one, so get the first element of the array and get its events args
       const newPost = postCreatedEvents[0].args;
+
+      //assert post has the expected content
       expect(newPost.text).to.equal("Hello world!");
       expect(newPost.isPaid).to.equal(true);
       expect(newPost.attachments).to.have.same.members([
