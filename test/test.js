@@ -15,11 +15,11 @@ describe("Aegis", () => {
 
   describe("Create User", () => {
     it("can create a new user", async () => {
-      const newUserTx = await aegis.createUser("sample username");
+      const newUserTx = await aegis.createUser("sample name");
       await newUserTx.wait();
 
       const user = await aegis.users(addr1.address);
-      expect(user.username).to.equal("sample username");
+      expect(user.name).to.equal("sample name");
       expect(user.publicKey).to.equal(addr1.address);
       expect(user.nftAddress).to.exist;
     });
@@ -27,11 +27,11 @@ describe("Aegis", () => {
     it("fails to create a new user when user already exists", async () => {
       try {
         //creating a new user first time
-        const newUserTx1 = await aegis.createUser("sample username 1");
+        const newUserTx1 = await aegis.createUser("sample name 1");
         await newUserTx1.wait();
 
         //creating a new user second time from same address as before
-        const newUserTx2 = await aegis.createUser("sample username 2");
+        const newUserTx2 = await aegis.createUser("sample name 2");
       } catch (error) {
         expect(error.message).to.include("User already exists.");
         return;

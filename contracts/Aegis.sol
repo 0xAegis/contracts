@@ -12,13 +12,13 @@ contract Aegis {
     uint256 public constant maxNumAttachments = 10;
 
     struct User {
-        string username;
+        string name;
         address publicKey;
         address nftAddress;
         Counters.Counter numPosts;
     }
 
-    event UserCreated(string username, address publicKey, address nftAddress);
+    event UserCreated(string name, address publicKey, address nftAddress);
     event UserFollowed(address follower, address followed);
     // The PostCreated event is the only place where the posts are stored
     event PostCreated(
@@ -58,7 +58,7 @@ contract Aegis {
         _;
     }
 
-    function createUser(string calldata username) public {
+    function createUser(string calldata name) public {
         //user should not already exist
         require(
             users[msg.sender].publicKey == address(0),
@@ -69,7 +69,7 @@ contract Aegis {
 
         Counters.Counter memory numPosts;
         User memory newUser = User({
-            username: username,
+            name: name,
             publicKey: msg.sender,
             nftAddress: address(nftContract),
             numPosts: numPosts
@@ -78,7 +78,7 @@ contract Aegis {
 
         //emit new event
         emit UserCreated({
-            username: username,
+            name: name,
             publicKey: msg.sender,
             nftAddress: address(nftContract)
         });
