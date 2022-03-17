@@ -12,7 +12,7 @@ contract Aegis {
     uint256 public constant maxNumAttachments = 10;
 
     struct User {
-        string username;
+        string name;
         address payable publicKey;
         address nftAddress;
     }
@@ -24,7 +24,7 @@ contract Aegis {
     }
 
     event UserCreated(
-        string username,
+        string name,
         address payable publicKey,
         address nftAddress
     );
@@ -65,7 +65,7 @@ contract Aegis {
         _;
     }
 
-    function createUser(string memory username) public {
+    function createUser(string memory name) public {
         //user should not already exist
         require(
             users[msg.sender].publicKey == address(0),
@@ -75,7 +75,7 @@ contract Aegis {
         AegisFollowers nftContract = new AegisFollowers();
 
         User memory newUser = User({
-            username: username,
+            name: name,
             publicKey: payable(msg.sender),
             nftAddress: address(nftContract)
         });
@@ -83,7 +83,7 @@ contract Aegis {
 
         //emit new event
         emit UserCreated({
-            username: username,
+            name: name,
             publicKey: payable(msg.sender),
             nftAddress: address(nftContract)
         });
