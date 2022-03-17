@@ -116,26 +116,18 @@ describe("Aegis", () => {
 
     it("following multiple times does not result in multiple follower NFTs", async () => {
       //create influencer user
-      const newUserTx1 = await aegis.createUser(
-        "sample influencer",
-        aegisFollowers1.address
-      );
+      const newUserTx1 = await aegis.createUser("sample influencer");
       await newUserTx1.wait();
+
+      //get the NFT collection of the influencer user
+      const user1 = await aegis.users(addr1.address);
+      const aegisFollowers1 = aegisFollowersFactory.attach(user1.nftAddress);
 
       //create follower 1 user
       const newUserTx2 = await aegis
         .connect(addr2)
-        .createUser("sample follower 1", aegisFollowers2.address);
+        .createUser("sample follower 1");
       await newUserTx2.wait();
-
-      // deploy an AegisFollowers NFT collection
-      aegisFollowers3 = await aegisFollowersFactory.deploy();
-      await aegisFollowers3.deployed();
-      //transfer ownership to Aegis
-      const transferOwnershipTx3 = await aegisFollowers3.transferOwnership(
-        aegis.address
-      );
-      await transferOwnershipTx3.wait();
 
       //follower 1 follows influencer
       const followTx1 = await aegis.connect(addr2).followUser(addr1.address);
