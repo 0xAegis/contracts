@@ -13,32 +13,25 @@ contract Aegis {
 
     struct User {
         string username;
-        address payable publicKey;
+        address publicKey;
         address nftAddress;
+        Counters.Counter numPosts;
     }
 
-    struct Post {
-        string text;
-        string[] attachments;
-        bool isPaid;
-    }
-
-    event UserCreated(
-        string username,
-        address payable publicKey,
-        address nftAddress
-    );
+    event UserCreated(string username, address publicKey, address nftAddress);
     event UserFollowed(address follower, address followed);
+    // The PostCreated event is the only place where the posts are stored
     event PostCreated(
-        address user,
+        address indexed user,
+        uint256 indexed postIndex,
+        bool indexed isPaid,
         string text,
         string[] attachments,
-        bool isPaid
+        uint256 timestamp
     );
 
     // User [] public users;
     mapping(address => User) public users;
-    mapping(address => Post[]) public posts;
 
     //if the user has minted his own follower NFT or not, (followedAddress => (followerAddress => bool))
     mapping(address => mapping(address => bool)) public userHasFollowerNft;
@@ -65,7 +58,7 @@ contract Aegis {
         _;
     }
 
-    function createUser(string memory username) public {
+    function createUser(string calldata username) public {
         //user should not already exist
         require(
             users[msg.sender].publicKey == address(0),
@@ -74,17 +67,19 @@ contract Aegis {
         //deploy new NFT collection for this user
         AegisFollowers nftContract = new AegisFollowers();
 
+        Counters.Counter memory numPosts;
         User memory newUser = User({
             username: username,
-            publicKey: payable(msg.sender),
-            nftAddress: address(nftContract)
+            publicKey: msg.sender,
+            nftAddress: address(nftContract),
+            numPosts: numPosts
         });
         users[msg.sender] = newUser;
 
         //emit new event
         emit UserCreated({
             username: username,
-            publicKey: payable(msg.sender),
+            publicKey: msg.sender,
             nftAddress: address(nftContract)
         });
     }
@@ -118,34 +113,17 @@ contract Aegis {
             "Too many attachments."
         );
 
-        //create post and push it to the posts array of the user
-        Post memory newPost = Post({
-            text: text,
-            attachments: attachments,
-            isPaid: isPaid
-        });
-        posts[msg.sender].push(newPost);
-
         //emit PostCreated event
         emit PostCreated({
             user: msg.sender,
+            postIndex: users[msg.sender].numPosts.current(),
+            isPaid: isPaid,
             text: text,
             attachments: attachments,
-            isPaid: isPaid
+            timestamp: block.timestamp
         });
-    }
 
-    //get the number of posts of an user
-    function getPostCount(address user) public view returns (uint256) {
-        return posts[user].length;
-    }
-
-    //get post of an user by index
-    function getPost(address user, uint256 postIndex)
-        public
-        view
-        returns (Post memory)
-    {
-        return posts[user][postIndex];
+        //increment the numPosts counter
+        users[msg.sender].numPosts.increment();
     }
 }

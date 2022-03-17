@@ -198,19 +198,23 @@ describe("Aegis", () => {
         ],
         true
       );
-      await createPostTx.wait();
+      const txReceipt = await createPostTx.wait();
 
       //post count of the user should be 1
-      expect(await aegis.getPostCount(addr1.address)).to.equal(1);
+      const user = await aegis.users(addr1.address);
+      expect(user.numPosts[0].toNumber()).to.equal(1);
 
       //assert post has the expected content
-      const newPost = await aegis.getPost(addr1.address, 0);
+      const filter = aegis.filters.PostCreated(addr1.address, 0);
+      const postCreatedEvents = await aegis.queryFilter(filter);
+      const newPost = postCreatedEvents[0].args;
       expect(newPost.text).to.equal("Hello world!");
       expect(newPost.isPaid).to.equal(true);
       expect(newPost.attachments).to.have.same.members([
         "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e5",
         "0xba643587c95dae76647e089b10142b07f1422203066290ce726a4f57bfa131e6",
       ]);
+      expect(newPost.timestamp).to.exist;
     });
 
     it("fails to create a post when post text is too long", async () => {
