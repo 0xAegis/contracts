@@ -1,6 +1,9 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
+const arcanaPublicKey =
+  "0x047a2b9f698aa78879603dfb29f84b0a501914076881eda98325ea98265433cc32114eda61d3aa0da7636937ca19fd5451fa0f8dd9b6fa02bf411168db05748944";
+
 describe("Aegis", () => {
   let aegis, aegisFollowersFactory;
   let addr1, addr2, addr3;
@@ -15,23 +18,30 @@ describe("Aegis", () => {
 
   describe("Create User", () => {
     it("can create a new user", async () => {
-      const newUserTx = await aegis.createUser("sample name");
+      const newUserTx = await aegis.createUser("sample name", arcanaPublicKey);
       await newUserTx.wait();
 
       const user = await aegis.users(addr1.address);
       expect(user.name).to.equal("sample name");
       expect(user.publicKey).to.equal(addr1.address);
+      expect(user.arcanaPublicKey).to.equal(arcanaPublicKey);
       expect(user.nftAddress).to.exist;
     });
 
     it("fails to create a new user when user already exists", async () => {
       try {
         //creating a new user first time
-        const newUserTx1 = await aegis.createUser("sample name 1");
+        const newUserTx1 = await aegis.createUser(
+          "sample name 1",
+          arcanaPublicKey
+        );
         await newUserTx1.wait();
 
         //creating a new user second time from same address as before
-        const newUserTx2 = await aegis.createUser("sample name 2");
+        const newUserTx2 = await aegis.createUser(
+          "sample name 2",
+          arcanaPublicKey
+        );
       } catch (error) {
         expect(error.message).to.include("User already exists.");
         return;
@@ -47,7 +57,10 @@ describe("Aegis", () => {
   describe("Follow User", () => {
     it("can follow user", async () => {
       //create influencer user
-      const newUserTx1 = await aegis.createUser("sample influencer");
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        arcanaPublicKey
+      );
       await newUserTx1.wait();
 
       //get the NFT collection of the influencer user
@@ -57,7 +70,7 @@ describe("Aegis", () => {
       //create follower user
       const newUserTx2 = await aegis
         .connect(addr2)
-        .createUser("sample follower");
+        .createUser("sample follower", arcanaPublicKey);
       await newUserTx2.wait();
 
       //follow user
@@ -70,7 +83,10 @@ describe("Aegis", () => {
 
     it("can follow user when follower already holds an NFT of the influencer", async () => {
       //create influencer user
-      const newUserTx1 = await aegis.createUser("sample influencer");
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        arcanaPublicKey
+      );
       await newUserTx1.wait();
 
       //get the NFT collection of the influencer user
@@ -80,13 +96,13 @@ describe("Aegis", () => {
       //create follower 1 user
       const newUserTx2 = await aegis
         .connect(addr2)
-        .createUser("sample follower 1");
+        .createUser("sample follower 1", arcanaPublicKey);
       await newUserTx2.wait();
 
       //create follower 2 user
       const newUserTx3 = await aegis
         .connect(addr3)
-        .createUser("sample follower 2");
+        .createUser("sample follower 2", arcanaPublicKey);
       await newUserTx3.wait();
 
       //follower 1 follows influencer
@@ -116,7 +132,10 @@ describe("Aegis", () => {
 
     it("following multiple times does not result in multiple follower NFTs", async () => {
       //create influencer user
-      const newUserTx1 = await aegis.createUser("sample influencer");
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        arcanaPublicKey
+      );
       await newUserTx1.wait();
 
       //get the NFT collection of the influencer user
@@ -126,7 +145,7 @@ describe("Aegis", () => {
       //create follower 1 user
       const newUserTx2 = await aegis
         .connect(addr2)
-        .createUser("sample follower 1");
+        .createUser("sample follower 1", arcanaPublicKey);
       await newUserTx2.wait();
 
       //follower 1 follows influencer
@@ -146,7 +165,10 @@ describe("Aegis", () => {
 
     it("fails to follow user when caller isn't an user", async () => {
       //create influencer user
-      const newUserTx1 = await aegis.createUser("sample influencer");
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        arcanaPublicKey
+      );
       await newUserTx1.wait();
 
       //follow user
@@ -162,7 +184,7 @@ describe("Aegis", () => {
 
     it("fails to follow user when the user to be followed doesn't exist", async () => {
       //create user
-      const newUserTx1 = await aegis.createUser("sample user");
+      const newUserTx1 = await aegis.createUser("sample user", arcanaPublicKey);
       await newUserTx1.wait();
 
       //follow user
@@ -184,7 +206,7 @@ describe("Aegis", () => {
 
     beforeEach(async () => {
       //create new user
-      const newUserTx = await aegis.createUser("sample user");
+      const newUserTx = await aegis.createUser("sample user", arcanaPublicKey);
       await newUserTx.wait();
     });
 

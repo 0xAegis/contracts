@@ -14,11 +14,17 @@ contract Aegis {
     struct User {
         string name;
         address publicKey;
+        string arcanaPublicKey;
         address nftAddress;
         Counters.Counter numPosts;
     }
 
-    event UserCreated(string name, address publicKey, address nftAddress);
+    event UserCreated(
+        string name,
+        address publicKey,
+        string arcanaPublicKey,
+        address nftAddress
+    );
     event UserFollowed(address follower, address followed);
     // The PostCreated event is the only place where the posts are stored
     event PostCreated(
@@ -58,7 +64,9 @@ contract Aegis {
         _;
     }
 
-    function createUser(string calldata name) public {
+    function createUser(string calldata name, string calldata arcanaPublicKey)
+        public
+    {
         //user should not already exist
         require(
             users[msg.sender].publicKey == address(0),
@@ -71,6 +79,7 @@ contract Aegis {
         User memory newUser = User({
             name: name,
             publicKey: msg.sender,
+            arcanaPublicKey: arcanaPublicKey,
             nftAddress: address(nftContract),
             numPosts: numPosts
         });
@@ -80,7 +89,8 @@ contract Aegis {
         emit UserCreated({
             name: name,
             publicKey: msg.sender,
-            nftAddress: address(nftContract)
+            nftAddress: address(nftContract),
+            arcanaPublicKey: arcanaPublicKey
         });
     }
 
