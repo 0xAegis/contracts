@@ -24,6 +24,7 @@ describe("Aegis", () => {
       const user = await aegis.users(addr1.address);
       expect(user.name).to.equal("sample name");
       expect(user.publicKey).to.equal(addr1.address);
+      expect(user.arcanaPublicKey).to.equal(arcanaPublicKey);
       expect(user.nftAddress).to.exist;
     });
 
