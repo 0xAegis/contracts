@@ -94,6 +94,48 @@ describe("Aegis", () => {
       expect(userFollowedEvent.followed).to.equal(addr1.address);
     });
 
+    it("can fetch followed users", async () => {
+      //create influencer user
+      const newUserTx1 = await aegis.createUser(
+        "sample influencer",
+        arcanaPublicKey
+      );
+      await newUserTx1.wait();
+
+      //create influencer user
+      const newUserTx2 = await aegis
+        .connect(addr2)
+        .createUser("sample influencer", arcanaPublicKey);
+      await newUserTx2.wait();
+
+      //create follower user
+      const newUserTx3 = await aegis
+        .connect(addr3)
+        .createUser("sample follower", arcanaPublicKey);
+      await newUserTx3.wait();
+
+      //follow user
+      const followTx = await aegis.connect(addr3).followUser(addr1.address);
+      await followTx.wait();
+
+      //follow user
+      const followTx2 = await aegis.connect(addr3).followUser(addr2.address);
+      await followTx2.wait();
+
+      //fetch number of users followed
+      const num = await aegis.numFollowedUsers(addr3.address);
+      expect(num).to.equal(2);
+
+      let followedArray = [];
+      for (i = 0; i < num; i++) {
+        const followedUser = await aegis.followedUsers(addr3.address, i);
+        followedArray.push(followedUser);
+      }
+      expect(followedArray.length).to.equal(2);
+      expect(followedArray[0]).to.equal(addr1.address);
+      expect(followedArray[1]).to.equal(addr2.address);
+    });
+
     it("can follow user when follower already holds an NFT of the influencer", async () => {
       //create influencer user
       const newUserTx1 = await aegis.createUser(

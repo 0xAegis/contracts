@@ -39,6 +39,12 @@ contract Aegis {
     // User [] public users;
     mapping(address => User) public users;
 
+    //Storing followed users
+    mapping(address => address[]) public followedUsers;
+
+    //Storing total number of followed users
+    mapping(address => uint16) public numFollowedUsers;
+
     //if the user has minted his own follower NFT or not, (followedAddress => (followerAddress => bool))
     mapping(address => mapping(address => bool)) public userHasFollowerNft;
 
@@ -109,6 +115,11 @@ contract Aegis {
         }
 
         emit UserFollowed({follower: msg.sender, followed: publicKey});
+
+        // update list of followedUsers
+        followedUsers[msg.sender].push(publicKey);
+        // update number of followedUsers
+        numFollowedUsers[msg.sender]++;
     }
 
     function createPost(
