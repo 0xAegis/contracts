@@ -1,5 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const { default: fetch } = require("node-fetch-cjs");
 
 const arcanaPublicKey =
   "0x047a2b9f698aa78879603dfb29f84b0a501914076881eda98325ea98265433cc32114eda61d3aa0da7636937ca19fd5451fa0f8dd9b6fa02bf411168db05748944";
@@ -87,6 +88,11 @@ describe("Aegis", () => {
 
       //assert event has the expected content
       expect(userFollowedEvent.followed).to.equal(addr1.address);
+
+      //check AegisFollower NFT metadata
+      const tokenMetadataUri = await aegisFollowers1.tokenURI(0);
+      const tokenMetadata = await (await fetch(tokenMetadataUri)).json();
+      console.log(tokenMetadata);
     });
 
     it("can follow user when follower already holds an NFT of the influencer", async () => {

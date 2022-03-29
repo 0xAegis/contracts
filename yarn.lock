@@ -5292,6 +5292,11 @@ node-addon-api@^2.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.2.tgz#432cfa82962ce494b132e9d72a15b29f71ff5d32"
   integrity sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==
 
+node-fetch-cjs@^3.2.3:
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/node-fetch-cjs/-/node-fetch-cjs-3.2.3.tgz#13f300c26a8b99f0aa51fd3f984f551f8295a6b7"
+  integrity sha512-/ak4PDuvC5TrOIRImsEW6vdF1YX/hk4JdjSEuKvutoBeOu7fRWc+ptE1MPUmz9O2BUyNH6lwBRIyKOqbu1fZfA==
+
 node-fetch@2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
