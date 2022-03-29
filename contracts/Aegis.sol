@@ -73,7 +73,7 @@ contract Aegis {
             "User already exists."
         );
         //deploy new NFT collection for this user
-        AegisFollowers nftContract = new AegisFollowers();
+        AegisFollowers nftContract = new AegisFollowers(msg.sender);
 
         Counters.Counter memory numPosts;
         User memory newUser = User({
