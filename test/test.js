@@ -1,5 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const { default: fetch } = require("node-fetch-cjs");
 
 const arcanaPublicKey =
   "0x047a2b9f698aa78879603dfb29f84b0a501914076881eda98325ea98265433cc32114eda61d3aa0da7636937ca19fd5451fa0f8dd9b6fa02bf411168db05748944";
@@ -80,18 +81,18 @@ describe("Aegis", () => {
       //follower should hold an nft of the influencer now
       expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
 
-      //Check event log for list of users followed
-      //create a filter for filtering events: addr2.address should be the follower
+      //check event log for UserFollowed event
       const filter = aegis.filters.UserFollowed(addr2.addresss);
-
-      //get all the events that match the above filter
       const userFollowedEvents = await aegis.queryFilter(filter);
-
-      //we know there will be only one, so get the first element of the array and get its events args
       const userFollowedEvent = userFollowedEvents[0].args;
 
       //assert event has the expected content
       expect(userFollowedEvent.followed).to.equal(addr1.address);
+
+      //check AegisFollower NFT metadata
+      const tokenMetadataUri = await aegisFollowers1.tokenURI(0);
+      const tokenMetadata = await (await fetch(tokenMetadataUri)).json();
+      console.log(tokenMetadata);
     });
 
     it("can follow user when follower already holds an NFT of the influencer", async () => {
