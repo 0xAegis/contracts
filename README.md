@@ -8,7 +8,7 @@ Install the required Node dependencies with _yarn_.
 $ yarn install
 ```
 
-Then populate the environment with the following environment variables, either through a `.env` file or in any other means.
+Then populate the environment with the following environment variables, either through a `.env` file or by any other means.
 
 ```
 MUMBAI_RPC_URL=https://polygon-mumbai.g.alchemy.com/v2/<alchemy-api-key>
