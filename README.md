@@ -1,15 +1,37 @@
-# Basic Sample Hardhat Project
+# Aegis Smart Contracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+## Seting up the environment
 
-Try running some of the following tasks:
+Install the required Node dependencies with _yarn_
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
+```
+$ yarn install
+```
+
+Then populate the environment with the following environment variables, either through a `.env` file or in any other means.
+
+```
+MUMBAI_RPC_URL=https://polygon-mumbai.g.alchemy.com/v2/<alchemy-api-key>
+POLYGON_RPC_URL=https://polygon-mainnet.g.alchemy.com/v2/<alchemy-api-key>
+PRIVATE_KEY=<wallet-private-key>
+```
+
+## Running tests
+
+```
+$ yarn hardhat test
+```
+
+## Deploying to chain
+
+For deploying to Mumbai
+
+```
+$ yarn hardhat run scripts/deploy-aegis.js --network mumbai
+```
+
+For deploying to Polygon mainnet
+
+```
+$ yarn hardhat run scripts/deploy-aegis.js --network polygon
 ```
