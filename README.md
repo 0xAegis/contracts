@@ -2,7 +2,7 @@
 
 ## Seting up the environment
 
-Install the required Node dependencies with _yarn_
+Install the required Node dependencies with _yarn_.
 
 ```
 $ yarn install
