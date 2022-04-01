@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./AegisFollowers.sol";
+import "./AegisSupporterToken.sol";
 
 contract Aegis {
     using Counters for Counters.Counter;
@@ -73,7 +73,7 @@ contract Aegis {
             "User already exists."
         );
         //deploy new NFT collection for this user
-        AegisFollowers nftContract = new AegisFollowers(msg.sender);
+        AegisSupporterToken nftContract = new AegisSupporterToken(msg.sender);
 
         Counters.Counter memory numPosts;
         User memory newUser = User({
@@ -101,9 +101,9 @@ contract Aegis {
     {
         User memory user = users[publicKey];
 
-        //mint an AegisFollowers NFT for the user if he doesn't have his own yet
+        //mint an AegisSupporterToken NFT for the user if he doesn't have his own yet
         if (!userHasFollowerNft[publicKey][msg.sender]) {
-            AegisFollowers token = AegisFollowers(user.nftAddress);
+            AegisSupporterToken token = AegisSupporterToken(user.nftAddress);
             token.safeMint(msg.sender);
             userHasFollowerNft[publicKey][msg.sender] = true;
         }
