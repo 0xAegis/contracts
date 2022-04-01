@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
-contract AegisFollowers is ERC721, ERC721Enumerable, Ownable {
+contract AegisSupporterToken is ERC721, ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     using Strings for uint256;
     using Strings for address;
@@ -16,7 +16,17 @@ contract AegisFollowers is ERC721, ERC721Enumerable, Ownable {
     Counters.Counter private _tokenIdCounter;
     address public user;
 
-    constructor(address publicKey) ERC721("AegisFollowers", "AGF") {
+    constructor(address publicKey)
+        ERC721(
+            string(
+                abi.encodePacked(
+                    "Aegis Supporter Token of User ",
+                    Strings.toHexString(uint256(uint160(user)), 20)
+                )
+            ),
+            "AST"
+        )
+    {
         user = publicKey;
     }
 
@@ -39,7 +49,7 @@ contract AegisFollowers is ERC721, ERC721Enumerable, Ownable {
         );
         // Create the SVG to be used as image
         bytes memory imageSvg = abi.encodePacked(
-            '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base{fill:#fff;font-family:monospace;font-size:10px}</style><rect width="100%" height="100%"/><text x="50%" y="20%" class="base" dominant-baseline="middle" text-anchor="middle">Aegis Follower Token</text><text x="50%" y="50%" class="base" dominant-baseline="middle" text-anchor="middle">of User ',
+            '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base{fill:#fff;font-family:monospace;font-size:10px}</style><rect width="100%" height="100%"/><text x="50%" y="20%" class="base" dominant-baseline="middle" text-anchor="middle">Aegis Supporter Token</text><text x="50%" y="50%" class="base" dominant-baseline="middle" text-anchor="middle">of User ',
             userPublicKey,
             '</text><text x="50%" y="80%" class="base" dominant-baseline="middle" text-anchor="middle"># ',
             tokenId.toString(),
@@ -48,14 +58,14 @@ contract AegisFollowers is ERC721, ERC721Enumerable, Ownable {
         // Create the JSON metadata
         bytes memory metadataJson = abi.encodePacked(
             "{",
-            '"name": "Aegis: Follower Token # ',
+            '"name": "Aegis Supporter Token # ',
             tokenId.toString(),
             " of User ",
             userPublicKey,
             '",',
-            '"description": "This token represents the ',
+            '"description": "This token represents follow # ',
             tokenId.toString(),
-            "th follow of user ",
+            " of user ",
             userPublicKey,
             '",',
             // In the image field, we put Base64 encoded SVG in form of a data URI

@@ -6,12 +6,14 @@ const arcanaPublicKey =
   "0x047a2b9f698aa78879603dfb29f84b0a501914076881eda98325ea98265433cc32114eda61d3aa0da7636937ca19fd5451fa0f8dd9b6fa02bf411168db05748944";
 
 describe("Aegis", () => {
-  let aegis, aegisFollowersFactory;
+  let aegis, aegisSupporterTokenFactory;
   let addr1, addr2, addr3;
 
   beforeEach(async () => {
     [addr1, addr2, addr3] = await ethers.getSigners();
-    aegisFollowersFactory = await ethers.getContractFactory("AegisFollowers");
+    aegisSupporterTokenFactory = await ethers.getContractFactory(
+      "AegisSupporterToken"
+    );
     const aegisFactory = await ethers.getContractFactory("Aegis");
     aegis = await aegisFactory.deploy();
     await aegis.deployed();
@@ -66,7 +68,9 @@ describe("Aegis", () => {
 
       //get the NFT collection of the influencer user
       const user1 = await aegis.users(addr1.address);
-      const aegisFollowers1 = aegisFollowersFactory.attach(user1.nftAddress);
+      const aegisSupporterToken1 = aegisSupporterTokenFactory.attach(
+        user1.nftAddress
+      );
 
       //create follower user
       const newUserTx2 = await aegis
@@ -79,7 +83,7 @@ describe("Aegis", () => {
       await followTx.wait();
 
       //follower should hold an nft of the influencer now
-      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
+      expect(await aegisSupporterToken1.balanceOf(addr2.address)).to.equal(1);
 
       //check event log for UserFollowed event
       const filter = aegis.filters.UserFollowed(addr2.addresss);
@@ -90,7 +94,7 @@ describe("Aegis", () => {
       expect(userFollowedEvent.followed).to.equal(addr1.address);
 
       //check AegisFollower NFT metadata
-      const tokenMetadataUri = await aegisFollowers1.tokenURI(0);
+      const tokenMetadataUri = await aegisSupporterToken1.tokenURI(0);
       const tokenMetadata = await (await fetch(tokenMetadataUri)).json();
       console.log(tokenMetadata);
     });
@@ -105,7 +109,9 @@ describe("Aegis", () => {
 
       //get the NFT collection of the influencer user
       const user1 = await aegis.users(addr1.address);
-      const aegisFollowers1 = aegisFollowersFactory.attach(user1.nftAddress);
+      const aegisSupporterToken1 = aegisSupporterTokenFactory.attach(
+        user1.nftAddress
+      );
 
       //create follower 1 user
       const newUserTx2 = await aegis
@@ -124,24 +130,24 @@ describe("Aegis", () => {
       await followTx1.wait();
 
       //follower 1 should hold an nft of the influencer now
-      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
+      expect(await aegisSupporterToken1.balanceOf(addr2.address)).to.equal(1);
 
       //follower 1 transfers NFT to follower 2
-      const transferTx = await aegisFollowers1
+      const transferTx = await aegisSupporterToken1
         .connect(addr2)
         .transferFrom(addr2.address, addr3.address, 0);
       await transferTx.wait();
 
       //follower 2 should hold the nft influencer now
-      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(0);
-      expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(1);
+      expect(await aegisSupporterToken1.balanceOf(addr2.address)).to.equal(0);
+      expect(await aegisSupporterToken1.balanceOf(addr3.address)).to.equal(1);
 
       //follower 2 follows influencer
       const followTx2 = await aegis.connect(addr3).followUser(addr1.address);
       await followTx2.wait();
 
       //follower 2 still should now hold 2 NFTs, because he needs his own unique one too
-      expect(await aegisFollowers1.balanceOf(addr3.address)).to.equal(2);
+      expect(await aegisSupporterToken1.balanceOf(addr3.address)).to.equal(2);
     });
 
     it("following multiple times does not result in multiple follower NFTs", async () => {
@@ -154,7 +160,9 @@ describe("Aegis", () => {
 
       //get the NFT collection of the influencer user
       const user1 = await aegis.users(addr1.address);
-      const aegisFollowers1 = aegisFollowersFactory.attach(user1.nftAddress);
+      const aegisSupporterToken1 = aegisSupporterTokenFactory.attach(
+        user1.nftAddress
+      );
 
       //create follower 1 user
       const newUserTx2 = await aegis
@@ -167,14 +175,14 @@ describe("Aegis", () => {
       await followTx1.wait();
 
       //follower 1 should hold an nft of the influencer now
-      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
+      expect(await aegisSupporterToken1.balanceOf(addr2.address)).to.equal(1);
 
       //follower 1 follows influencer again
       const followTx2 = await aegis.connect(addr2).followUser(addr1.address);
       await followTx2.wait();
 
       //follower 2 should still hold a single nft of the influencer
-      expect(await aegisFollowers1.balanceOf(addr2.address)).to.equal(1);
+      expect(await aegisSupporterToken1.balanceOf(addr2.address)).to.equal(1);
     });
 
     it("fails to follow user when caller isn't an user", async () => {
