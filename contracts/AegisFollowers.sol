@@ -53,7 +53,7 @@ contract AegisFollowers is ERC721, ERC721Enumerable, Ownable {
             " of User ",
             userPublicKey,
             '",',
-            '"description": "This token represents follow #',
+            '"description": "This token represents follow # ',
             tokenId.toString(),
             " of user ",
             userPublicKey,
