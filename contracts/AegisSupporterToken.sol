@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
-contract AegisFollowers is ERC721, ERC721Enumerable, Ownable {
+contract AegisSupporterToken is ERC721, ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     using Strings for uint256;
     using Strings for address;
@@ -16,7 +16,17 @@ contract AegisFollowers is ERC721, ERC721Enumerable, Ownable {
     Counters.Counter private _tokenIdCounter;
     address public user;
 
-    constructor(address publicKey) ERC721("AegisFollowers", "AGF") {
+    constructor(address publicKey)
+        ERC721(
+            string(
+                abi.encodePacked(
+                    "Aegis Supporter Token of User ",
+                    Strings.toHexString(uint256(uint160(user)), 20)
+                )
+            ),
+            "AST"
+        )
+    {
         user = publicKey;
     }
 
@@ -48,7 +58,7 @@ contract AegisFollowers is ERC721, ERC721Enumerable, Ownable {
         // Create the JSON metadata
         bytes memory metadataJson = abi.encodePacked(
             "{",
-            '"name": "Aegis: Follower Token # ',
+            '"name": "Aegis Supporter Token # ',
             tokenId.toString(),
             " of User ",
             userPublicKey,
