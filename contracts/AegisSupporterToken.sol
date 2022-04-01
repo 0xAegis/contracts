@@ -49,7 +49,7 @@ contract AegisSupporterToken is ERC721, ERC721Enumerable, Ownable {
         );
         // Create the SVG to be used as image
         bytes memory imageSvg = abi.encodePacked(
-            '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base{fill:#fff;font-family:monospace;font-size:10px}</style><rect width="100%" height="100%"/><text x="50%" y="20%" class="base" dominant-baseline="middle" text-anchor="middle">Aegis Follower Token</text><text x="50%" y="50%" class="base" dominant-baseline="middle" text-anchor="middle">of User ',
+            '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350"><style>.base{fill:#fff;font-family:monospace;font-size:10px}</style><rect width="100%" height="100%"/><text x="50%" y="20%" class="base" dominant-baseline="middle" text-anchor="middle">Aegis Supporter Token</text><text x="50%" y="50%" class="base" dominant-baseline="middle" text-anchor="middle">of User ',
             userPublicKey,
             '</text><text x="50%" y="80%" class="base" dominant-baseline="middle" text-anchor="middle"># ',
             tokenId.toString(),
