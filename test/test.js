@@ -244,12 +244,8 @@ describe("Aegis", () => {
       );
       const txReceipt = await createPostTx.wait();
 
-      //post count of the user should be 1
-      const user = await aegis.users(addr1.address);
-      expect(user.numPosts[0].toNumber()).to.equal(1);
-
-      //create a filter for filtering events: addr1.address should be the user, 0 should be the postIndex
-      const filter = aegis.filters.PostCreated(addr1.address, 0);
+      //create a filter for filtering events: addr1.address should be the user
+      const filter = aegis.filters.PostCreated(addr1.address);
       //get all the events that match the above filter
       const postCreatedEvents = await aegis.queryFilter(filter);
       //we know there will be only one, so get the first element of the array and get its events args

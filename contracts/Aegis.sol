@@ -16,7 +16,6 @@ contract Aegis {
         address publicKey;
         string arcanaPublicKey;
         address nftAddress;
-        Counters.Counter numPosts;
     }
 
     event UserCreated(
@@ -28,8 +27,7 @@ contract Aegis {
     event UserFollowed(address follower, address followed);
     // The PostCreated event is the only place where the posts are stored
     event PostCreated(
-        address indexed user,
-        uint256 indexed postIndex,
+        address indexed author,
         bool indexed isPaid,
         string text,
         string[] attachments,
@@ -75,13 +73,11 @@ contract Aegis {
         //deploy new NFT collection for this user
         AegisSupporterToken nftContract = new AegisSupporterToken(msg.sender);
 
-        Counters.Counter memory numPosts;
         User memory newUser = User({
             name: name,
             publicKey: msg.sender,
             arcanaPublicKey: arcanaPublicKey,
-            nftAddress: address(nftContract),
-            numPosts: numPosts
+            nftAddress: address(nftContract)
         });
         users[msg.sender] = newUser;
 
@@ -125,15 +121,11 @@ contract Aegis {
 
         //emit PostCreated event
         emit PostCreated({
-            user: msg.sender,
-            postIndex: users[msg.sender].numPosts.current(),
+            author: msg.sender,
             isPaid: isPaid,
             text: text,
             attachments: attachments,
             timestamp: block.timestamp
         });
-
-        //increment the numPosts counter
-        users[msg.sender].numPosts.increment();
     }
 }

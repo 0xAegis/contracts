@@ -11,7 +11,6 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 contract AegisSupporterToken is ERC721, ERC721Enumerable, Ownable {
     using Counters for Counters.Counter;
     using Strings for uint256;
-    using Strings for address;
 
     Counters.Counter private _tokenIdCounter;
     address public user;
